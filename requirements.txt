@@ -1,0 +1,3 @@
+PyQt5==5.14.2
+PyQt5-sip==12.7.2
+PythonMagick  # PythonMagick-0.9.19-cp36-cp36m-win_amd64.whl
