@@ -7,12 +7,12 @@
 import sys
 from math import ceil
 
-from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QThread, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QStyleFactory
+from PyQt5.QtWidgets import QApplication, QStyleFactory, QFileDialog
 
 from interface.ui import UI
-from libs.png2ico import png2ico
+
+from libs.convertor import convertor_dict
 
 
 class CommonHelper(object):
@@ -35,7 +35,7 @@ class ThreadConvert(QThread):
     def run(self):
         for num, file in enumerate(self.files):
             self.signal_progress.emit(ceil((num + 1) * 100 / len(self.files)))
-            self.key(file)
+            self.key(file, '32x32')
         self.signal_statusbar.emit(len(self.files))
 
 
@@ -45,15 +45,41 @@ class MainWindow(UI):
 
         self.thread_convert = None
 
-    def on_button_convert_clicked(self):
+    def button_select_clicked(self):
+        current_text = self.central.tabText(self.central.currentIndex())
+        if current_text == 'png2ico':
+            self.files, _ = QFileDialog.getOpenFileNames(self, 'Select images..', '', '*.png')
+        elif current_text == 'svg2ico':
+            self.files, _ = QFileDialog.getOpenFileNames(self, 'Select images..', '', '*.svg')
+        elif current_text == 'svg2png':
+            self.files, _ = QFileDialog.getOpenFileNames(self, 'Select images..', '', '*.svg')
+
+        self.statusBar.showMessage(f'{len(self.files)} file(s) selected.', msecs=5000)
+
+        if current_text == 'png2ico':
+            self.png2ico_button_convert.setEnabled(bool(self.files))
+        elif current_text == 'svg2ico':
+            self.svg2ico_button_convert.setEnabled(bool(self.files))
+        elif current_text == 'svg2png':
+            self.svg2png_button_convert.setEnabled(bool(self.files))
+
+    def button_convert_clicked(self):
         if self.files:
-            self.thread_convert = ThreadConvert(self.files, png2ico)
+            current_text = self.central.tabText(self.central.currentIndex())
+            convertor = convertor_dict[current_text]
+            self.thread_convert = ThreadConvert(self.files, convertor)
             self.progress.setVisible(True)
             self.thread_convert.signal_progress.connect(self.update_progress)
             self.thread_convert.signal_statusbar.connect(self.update_statusbar)
             self.thread_convert.start()
             self.files = None
-            self.button_convert.setDisabled(True)
+
+            if current_text == 'png2ico':
+                self.png2ico_button_convert.setDisabled(True)
+            elif current_text == 'svg2ico':
+                self.svg2ico_button_convert.setDisabled(True)
+            elif current_text == 'svg2png':
+                self.svg2png_button_convert.setDisabled(True)
 
 
 if __name__ == '__main__':

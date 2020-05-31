@@ -6,21 +6,12 @@
 # Create Time: 2020-05-28 22:43
 import sys
 
-from PyQt5 import QtCore, Qt, QtGui
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QIcon, QPalette, QColor, QMouseEvent
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 
 from conf.settings import APP_NAME
 from sources import sources
-
-
-class Tab(QTabWidget):
-    def __init__(self, parent=None):
-        super(Tab, self).__init__(parent)
-
-    def enterEvent(self, event: QtCore.QEvent) -> None:
-        self.activateWindow()
 
 
 class UI(QMainWindow):
@@ -42,39 +33,55 @@ class UI(QMainWindow):
         pass
 
     def __init_central(self):
-        self.button_select = QPushButton('Select images..', self)
-        self.button_select.setObjectName('button_select')
-        self.button_select.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.button_convert = QPushButton('Convert', self)
-        self.button_convert.setObjectName('button_convert')
-        self.button_convert.setDisabled(True)
+        self.png2ico_button_select = QPushButton('Select images..', self)
+        self.png2ico_button_select.clicked.connect(self.button_select_clicked)
+        self.png2ico_button_select.setObjectName('button_select')
+        self.png2ico_button_select.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.png2ico_button_convert = QPushButton('Convert', self)
+        self.png2ico_button_convert.clicked.connect(self.button_convert_clicked)
+        self.png2ico_button_convert.setObjectName('button_convert')
+        self.png2ico_button_convert.setDisabled(True)
 
-        layout = QHBoxLayout()
-        layout.addWidget(self.button_select)
-        layout.addWidget(self.button_convert)
+        self.svg2ico_button_select = QPushButton('Select images..', self)
+        self.svg2ico_button_select.clicked.connect(self.button_select_clicked)
+        self.svg2ico_button_select.setObjectName('button_select')
+        self.svg2ico_button_select.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.svg2ico_button_convert = QPushButton('Convert', self)
+        self.svg2ico_button_convert.clicked.connect(self.button_convert_clicked)
+        self.svg2ico_button_convert.setObjectName('button_convert')
+        self.svg2ico_button_convert.setDisabled(True)
+
+        self.svg2png_button_select = QPushButton('Select images..', self)
+        self.svg2png_button_select.clicked.connect(self.button_select_clicked)
+        self.svg2png_button_select.setObjectName('button_select')
+        self.svg2png_button_select.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.svg2png_button_convert = QPushButton('Convert', self)
+        self.svg2png_button_convert.clicked.connect(self.button_convert_clicked)
+        self.svg2png_button_convert.setObjectName('button_convert')
+        self.svg2png_button_convert.setDisabled(True)
+
+        png2ico_layout = QHBoxLayout()
+        png2ico_layout.addWidget(self.png2ico_button_select)
+        png2ico_layout.addWidget(self.png2ico_button_convert)
         self.tab_png2ico = QWidget(self)
-        self.tab_png2ico.setLayout(layout)
+        self.tab_png2ico.setLayout(png2ico_layout)
 
-        layout = QHBoxLayout()
-        layout.addWidget(self.button_select)
-        layout.addWidget(self.button_convert)
-        self.tab_png2ico = QWidget(self)
-        self.tab_png2ico.setLayout(layout)
-
-        _ = QHBoxLayout()
-        _.addWidget(QLabel('Developing', self))
-        self.tab_svg2png = QWidget(self)
-        self.tab_svg2png.setLayout(_)
-
-        _ = QHBoxLayout()
-        _.addWidget(QLabel('Developing', self))
+        svg2ico_layout = QHBoxLayout()
+        svg2ico_layout.addWidget(self.svg2ico_button_select)
+        svg2ico_layout.addWidget(self.svg2ico_button_convert)
         self.tab_svg2ico = QWidget(self)
-        self.tab_svg2ico.setLayout(_)
+        self.tab_svg2ico.setLayout(svg2ico_layout)
 
-        self.central = Tab(self)
+        svg2png_layout = QHBoxLayout()
+        svg2png_layout.addWidget(self.svg2png_button_select)
+        svg2png_layout.addWidget(self.svg2png_button_convert)
+        self.tab_svg2png = QWidget(self)
+        self.tab_svg2png.setLayout(svg2png_layout)
+
+        self.central = QTabWidget(self)
         self.central.addTab(self.tab_png2ico, 'png2ico')
-        self.central.addTab(self.tab_svg2png, 'svg2png')
         self.central.addTab(self.tab_svg2ico, 'svg2ico')
+        self.central.addTab(self.tab_svg2png, 'svg2png')
 
         self.setCentralWidget(self.central)
 
@@ -87,18 +94,14 @@ class UI(QMainWindow):
         self.progress.setTextVisible(False)
         self.statusBar.addPermanentWidget(self.progress)
 
-    @pyqtSlot()
-    def on_button_select_clicked(self):
-        self.files, _ = QFileDialog.getOpenFileNames(self, 'Select images..', '', '*.png')
-        self.statusBar.showMessage(f'{len(self.files)} file(s) selected.', msecs=5000)
-        self.button_convert.setEnabled(bool(self.files))
+    def button_select_clicked(self):
+        pass
 
-    @pyqtSlot()
-    def on_button_convert_clicked(self):
+    def button_convert_clicked(self):
         pass
 
     def disable_button_convert(self):
-        self.button_convert.setDisabled(True)
+        self.png2ico_button_convert.setDisabled(True)
 
     def update_progress(self, msg):
         if msg == 100:
@@ -108,22 +111,6 @@ class UI(QMainWindow):
 
     def update_statusbar(self, msg):
         self.statusBar.showMessage(f'{msg} file(s) converted.', msecs=5000)
-
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.m_flag = True
-            self.m_Position = event.globalPos() - self.pos()  # 获取鼠标相对窗口的位置
-            event.accept()
-            self.setCursor(QtGui.QCursor(QtCore.Qt.OpenHandCursor))  # 更改鼠标图标
-
-    def mouseMoveEvent(self, event: QMouseEvent):
-        if QtCore.Qt.LeftButton and self.m_flag:
-            self.move(event.globalPos() - self.m_Position)  # 更改窗口位置
-            event.accept()
-
-    def mouseReleaseEvent(self, event: QMouseEvent):
-        self.m_flag = False
-        self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
 
 
 if __name__ == '__main__':
