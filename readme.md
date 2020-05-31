@@ -3,9 +3,9 @@
 
 - [x] png to ico
 
-- [ ] svg to png
+- [x] svg to png
 
-- [ ] svg to ico
+- [x] svg to ico
 
 
 ![png2ico](./md/png2ico.jpg)
