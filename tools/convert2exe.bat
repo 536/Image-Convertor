@@ -1,0 +1,1 @@
+pyinstaller -F ../main.py -i ../sources/images/app.ico

@@ -2,3 +2,6 @@ __pycache__/
 
 /.idea/
 /venv/
+/tools/build/
+/tools/dist/
+/tools/main.spec
