@@ -17,9 +17,13 @@ from libs.convertor import convertor_dict
 
 class CommonHelper(object):
     @staticmethod
-    def read(style):
-        with open(style, mode='r', encoding='utf-8') as f:
-            return f.read()
+    def read(qss):
+        try:
+            with open(qss, mode='r', encoding='utf-8') as f:
+                return f.read()
+        except Exception as e:
+            print(e)
+            return ''
 
 
 class ThreadConvert(QThread):
