@@ -1,1 +1,1 @@
-pyinstaller -F -w ../main.py -i ../sources/images/app.ico
+pyinstaller -F -w --clean ../main.py -i ../sources/images/app.ico --add-data ../sources/style.qss;./sources/style.qss -n ImageConvertor
